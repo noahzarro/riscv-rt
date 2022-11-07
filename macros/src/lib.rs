@@ -82,10 +82,13 @@ pub fn entry(args: TokenStream, input: TokenStream) -> TokenStream {
         && f.sig.generics.params.is_empty()
         && f.sig.generics.where_clause.is_none()
         && f.sig.variadic.is_none()
+        /*
         && match f.sig.output {
             ReturnType::Default => false,
-            ReturnType::Type(_, ref ty) => matches!(**ty, Type::Never(_)),
+            ReturnType::Type(_, ref ty) => matches!(**ty, Type::),
         };
+        */
+        ;
 
     if !valid_signature {
         return parse::Error::new(
@@ -111,7 +114,7 @@ pub fn entry(args: TokenStream, input: TokenStream) -> TokenStream {
     quote!(
         #[export_name = "main"]
         #(#attrs)*
-        pub #unsafety fn __risc_v_rt__main(#args) -> ! {
+        pub #unsafety fn __risc_v_rt__main(#args) -> u32 {
             #(#stmts)*
         }
     )

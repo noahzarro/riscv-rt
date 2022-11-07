@@ -334,6 +334,9 @@ extern crate r0;
 extern crate riscv;
 extern crate riscv_rt_macros as macros;
 
+
+use core::arch::asm;
+
 pub use macros::{entry, pre_init};
 
 use riscv::register::mcause;
@@ -365,7 +368,7 @@ pub unsafe extern "C" fn start_rust(a0: usize, a1: usize, a2: usize) -> ! {
     #[rustfmt::skip]
     extern "Rust" {
         // This symbol will be provided by the user via `#[entry]`
-        fn main(a0: usize, a1: usize, a2: usize) -> !;
+        fn main(a0: usize, a1: usize, a2: usize) -> u32;
 
         // This symbol will be provided by the user via `#[pre_init]`
         fn __pre_init();
@@ -386,7 +389,19 @@ pub unsafe extern "C" fn start_rust(a0: usize, a1: usize, a2: usize) -> ! {
 
     _setup_interrupts();
 
-    main(a0, a1, a2);
+    let mut main_res = main(a0, a1, a2);
+    main_res = main_res | 0x80000000;
+    let ret_reg = 0x1a1040a0;
+
+    asm!(  
+        "sw	{0},0({1})",
+        in(reg) main_res,
+        in(reg) ret_reg
+    );
+    
+    loop {
+        asm!("wfi");
+    }
 }
 
 /// Registers saved in trap handler
