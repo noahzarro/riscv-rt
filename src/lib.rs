@@ -345,19 +345,6 @@ use riscv::register::mcause;
 #[doc(hidden)]
 pub static __ONCE__: () = ();
 
-extern "C" {
-    // Boundaries of the .bss section
-    static mut _ebss: u32;
-    static mut _sbss: u32;
-
-    // Boundaries of the .data section
-    static mut _edata: u32;
-    static mut _sdata: u32;
-
-    // Initial values of the .data section (stored in Flash)
-    static _sidata: u32;
-}
-
 /// Rust entry point (_start_rust)
 ///
 /// Zeros bss section, initializes data section and calls main. This function
@@ -380,9 +367,6 @@ pub unsafe extern "C" fn start_rust(a0: usize, a1: usize, a2: usize) -> ! {
 
     if _mp_hook() {
         __pre_init();
-
-        r0::zero_bss(&mut _sbss, &mut _ebss);
-        r0::init_data(&mut _sdata, &mut _edata, &_sidata);
     }
 
     // TODO: Enable FPU when available
@@ -564,3 +548,6 @@ pub extern "Rust" fn default_mp_hook() -> bool {
         },
     }
 }
+
+#[doc(hidden)]
+pub mod clic;
