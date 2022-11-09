@@ -92,6 +92,11 @@ _abs_start:
     
     // Allocate stacks
     la sp, _stack_start
+
+    // Here the stack pointer is set for multi core
+    // However, since the main core is not #0 but #992, the stack would start way of the memory boundary
+
+/* 
     lui t0, %hi(_hart_stack_size)
     add t0, t0, %lo(_hart_stack_size)
 #ifdef __riscv_mul
@@ -107,7 +112,7 @@ _abs_start:
 2:
 #endif
     sub sp, sp, t0
-
+*/
     // Set frame pointer
     add s0, sp, zero
 
@@ -121,8 +126,10 @@ _abs_start:
     Saves caller saved registers ra, t0..6, a0..7, calls _start_trap_rust,
     restores caller saved registers and then returns.
 */
+.balign 64
 .section .trap, "ax"
 .global default_start_trap
+
 
 default_start_trap:
     addi sp, sp, -16*REGBYTES
@@ -173,6 +180,8 @@ default_start_trap:
 default_setup_interrupts:
     // Set trap handler
     la t0, _start_trap
+    andi t0, 0xc0
+    ori t0, 0x3
     csrw mtvec, t0
     ret
 
