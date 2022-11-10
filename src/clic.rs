@@ -82,8 +82,8 @@ pub mod crs {
         unsafe {
             asm!(  
                 "csrr {0}, {1}",
-                in(reg) crs_nr,
                 out(reg) value,
+                in(reg) crs_nr,
             );   
         }
         value
