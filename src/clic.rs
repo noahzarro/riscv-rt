@@ -21,6 +21,14 @@ pub mod addr {
             }
         }
 
+        pub fn write_byte(&self, reg_offset: isize, mask: u8, bitoffset: u8, value: u8) {
+            unsafe {
+                let reg_value = core::ptr::read_volatile((self.base_address as *mut u8).offset(reg_offset));
+                let reg_value = (reg_value & mask) | (value << bitoffset);
+                core::ptr::write_volatile((self.base_address as *mut u8).offset(reg_offset), reg_value);
+            }
+        }
+
         pub fn read(&self, reg_offset: isize, mask: u32, bitoffset: u32) -> u32 {
             unsafe {
                 let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset));
@@ -31,11 +39,11 @@ pub mod addr {
 
     /* CLIC Configuration */
     pub const CLICCFG_REG_OFFSET: isize = 0x0 as isize;
-    pub const CLICCFG_NVBITS_BIT:  u32 = 0 as u32;
-    pub const CLICCFG_NLBITS_MASK: u32 = 0xFFFFFFE1 as  u32;
-    pub const CLICCFG_NLBITS_OFFSET:  u32 = 1 as  u32;
-    pub const CLICCFG_NMBITS_MASK:  u32 = 0xFFFFFF9F as  u32;
-    pub const CLICCFG_NMBITS_OFFSET:  u32 = 5 as  u32;
+    pub const CLICCFG_NVBITS_BIT:  u8 = 0;
+    pub const CLICCFG_NLBITS_MASK: u8 = 0xE1 as  u8;
+    pub const CLICCFG_NLBITS_OFFSET:  u8 = 1 as  u8;
+    pub const CLICCFG_NMBITS_MASK:  u8 = 0x9F as  u8;
+    pub const CLICCFG_NMBITS_OFFSET:  u8 = 5 as  u8;
 
     /* CLIC Information */
     pub const CLICINFO_REG_OFFSET: isize = 0x4 as isize;
@@ -52,46 +60,48 @@ pub mod addr {
     pub const CLICINFO_NUM_TRIGGER_OFFSET:  u32 = 25 as  u32;
 
     /* CLIC enable mnxti irq forwarding logic */
+    /*
     pub const CLICXNXTICONF_REG_OFFSET: isize = 0x8 as isize;
     pub const CLICXNXTICONF_CLICXNXTICONF_BIT: u32 = 0 as  u32;
+    */
 
     /* CLIC interrupt id pending */
     pub fn CLICINTIP_REG_OFFSET(id: u32) -> isize {
         (0x1000 + 0x10 * id) as isize
     }
-    pub const CLICINTIP_CLICINTIP_BIT: u32 = 0 as u32;
-    pub const CLICINTIP_CLICINTIP_MASK: u32 = 0xFFFFFFFE;
+    pub const CLICINTIP_CLICINTIP_BIT: u8 = 0;
+    pub const CLICINTIP_CLICINTIP_MASK: u8 = 0xFE;
 
     /* CLIC interrupt id enable */
     pub fn CLICINTIE_REG_OFFSET(id: u32) -> isize {
         (0x1004 + 0x10 * id) as isize
     }
-    pub const CLICINTIE_CLICINTIE_BIT: u32 = 0 as u32;
-    pub const CLICINTIP_CLICINTIE_MASK: u32 = 0xFFFFFFFE;
+    pub const CLICINTIE_CLICINTIE_BIT: u8 = 0;
+    pub const CLICINTIP_CLICINTIE_MASK: u8 = 0xFE;
 
 
     /* CLIC interrupt id attributes */
     pub fn CLICINTATTR_REG_OFFSET(id: u32) -> isize {
         (0x1008 + 0x10 * id) as isize
     }
-    pub const CLICINTATTR_SHV_BIT:  u32 = 0 as  u32;
-    pub const CLICINTATTR_SHV_MASK:  u32 = 0xFFFFFFFE as  u32;
-    pub const CLICINTATTR_TRIG_MASK:  u32 = 0xFFFFFFF9 as  u32;
-    pub const CLICINTATTR_TRIG_OFFSET:  u32 = 1 as  u32;
-    pub const CLICINTATTR_MODE_MASK:  u32 = 0xFFFFFF3F as  u32;
-    pub const CLICINTATTR_MODE_OFFSET:  u32 = 6 as  u32;
+    pub const CLICINTATTR_SHV_BIT:  u8 = 0 ;
+    pub const CLICINTATTR_SHV_MASK:  u8 = 0xFE ;
+    pub const CLICINTATTR_TRIG_MASK:  u8 = 0xF9 ;
+    pub const CLICINTATTR_TRIG_OFFSET:  u8 = 1 ;
+    pub const CLICINTATTR_MODE_MASK:  u8 = 0x3F ;
+    pub const CLICINTATTR_MODE_OFFSET:  u8 = 6 ;
 
-    pub const TRIG_LEVEL:  u32 = 0 as  u32;
-    pub const TRIG_EDGE:  u32 = 1 as  u32;
-    pub const TRIG_POSITIVE:  u32 = 0 << 1 as  u32;
-    pub const TRIG_NEGATIVE:  u32 = 1 << 1 as  u32;
+    pub const TRIG_LEVEL:  u8 = 0 ;
+    pub const TRIG_EDGE:  u8 = 1 ;
+    pub const TRIG_POSITIVE:  u8 = 0 << 1 ;
+    pub const TRIG_NEGATIVE:  u8 = 1 << 1 ;
 
     /* CLIC interrupt id control */
     pub fn CLICINTCTL_REG_OFFSET(id: u32) -> isize {
         (0x100c + 0x10 * id) as isize
     }
-    pub const CLICINTCTL_CLICINTCTL_MASK:  u32 = 0xFFFFFF00 as  u32;
-    pub const CLICINTCTL_CLICINTCTL_OFFSET:  u32 = 0 as  u32;
+    pub const CLICINTCTL_CLICINTCTL_MASK:  u8 = 0x00;
+    pub const CLICINTCTL_CLICINTCTL_OFFSET:  u8 = 0;
 
     pub const CSR_MXNTI_ID:  u32 = 0x345 as  u32;
     pub const MIE:  u32 = 8 as  u32;
