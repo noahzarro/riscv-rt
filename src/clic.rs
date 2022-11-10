@@ -1,5 +1,7 @@
+#[allow(missing_docs)]
 pub mod addresses {
 
+    /// agi
     pub struct MemoryMapper {
         base_address: *mut u32,
     }
@@ -91,6 +93,7 @@ pub mod addresses {
     pub const MIE:  u32 = 8 as  u32;
 }
 
+#[allow(missing_docs)]
 pub mod crs {
     use core::arch::asm;
     /*

@@ -549,5 +549,5 @@ pub extern "Rust" fn default_mp_hook() -> bool {
     }
 }
 
-#[doc(hidden)]
+/// I document the current module!
 pub mod clic;
