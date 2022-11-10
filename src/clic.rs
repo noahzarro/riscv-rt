@@ -1,5 +1,5 @@
 #[allow(missing_docs)]
-pub mod addresses {
+pub mod addr {
 
     /// agi
     pub struct MemoryMapper {
