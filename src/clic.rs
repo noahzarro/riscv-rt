@@ -66,7 +66,7 @@ pub mod addresses {
 
 pub mod crs {
     use core::arch::asm;
-
+    /*
     pub fn write_crs(crs_nr:u32, value:u32){
         unsafe {
             asm!(  
@@ -76,7 +76,7 @@ pub mod crs {
             );   
         }
     }
-
+    
     pub fn read_crs(crs_nr:u32) -> u32{
         let mut value = 0;
         unsafe {
@@ -88,6 +88,7 @@ pub mod crs {
         }
         value
     }
+    */
 
     pub const CSR_MSTATUS: u32 = 0x300;
     pub const CSR_MISA: u32 = 0x301;
