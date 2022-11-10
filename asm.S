@@ -137,6 +137,7 @@ default_start_trap:
 .global default_setup_interrupts
 
 default_setup_interrupts:
+    csrrsi	a5,mstatus,8
 	la t0, __clic_vector_table
 	or t0, t0, 1 
 	csrw mtvec, t0
