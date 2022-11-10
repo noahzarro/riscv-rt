@@ -1,5 +1,32 @@
 pub mod addresses {
 
+    struct MemoryMapper {
+        base_address: *mut u32,
+    }
+
+    impl MemoryMapper {
+        pub fn new(base_address: *mut u32) -> Self{
+            Self {
+                base_address: base_address,
+            }
+        }
+
+        pub fn write(&self, reg_offset: isize, mask: u32, bitoffset: u32, value: u32) {
+            unsafe {
+                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset));
+                let reg_value = (reg_value & mask) | (value << bitoffset);
+                core::ptr::write_volatile(self.base_address.offset(reg_offset), reg_value);
+            }
+        }
+
+        pub fn read(&self, reg_offset: isize, mask: u32, bitoffset: u32) -> u32 {
+            unsafe {
+                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset));
+                (reg_value & mask) >> bitoffset
+            }
+        }
+    }
+
     /* CLIC Configuration */
     pub const CLIC_CLICCFG_REG_OFFSET: isize = 0x0 as isize;
     pub const CLIC_CLICCFG_NVBITS_BIT:  u32 = 0 as u32;
