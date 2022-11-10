@@ -32,23 +32,23 @@ pub mod addr {
     /* CLIC Configuration */
     pub const CLICCFG_REG_OFFSET: isize = 0x0 as isize;
     pub const CLICCFG_NVBITS_BIT:  u32 = 0 as u32;
-    pub const CLICCFG_NLBITS_MASK: u32 = 0xf as  u32;
+    pub const CLICCFG_NLBITS_MASK: u32 = 0xFFFFFFE1 as  u32;
     pub const CLICCFG_NLBITS_OFFSET:  u32 = 1 as  u32;
-    pub const CLICCFG_NMBITS_MASK:  u32 = 0x3 as  u32;
+    pub const CLICCFG_NMBITS_MASK:  u32 = 0xFFFFFF9F as  u32;
     pub const CLICCFG_NMBITS_OFFSET:  u32 = 5 as  u32;
 
     /* CLIC Information */
     pub const CLICINFO_REG_OFFSET: isize = 0x4 as isize;
-    pub const CLICINFO_NUM_INTERRUPT_MASK:  u32 = 0x1fff as  u32;
+    pub const CLICINFO_NUM_INTERRUPT_MASK:  u32 = 0xFFFFE000 as  u32;
     pub const CLICINFO_NUM_INTERRUPT_OFFSET:  u32 = 0 as  u32;
 
-    pub const CLICINFO_VERSION_MASK:  u32 = 0xff as  u32;
+    pub const CLICINFO_VERSION_MASK:  u32 = 0xFFE01FFF as  u32;
     pub const CLICINFO_VERSION_OFFSET:  u32 = 13 as  u32;
 
-    pub const CLICINFO_CLICINTCTLBITS_MASK:  u32 = 0xf as  u32;
+    pub const CLICINFO_CLICINTCTLBITS_MASK:  u32 = 0xFE1FFFFF as  u32;
     pub const CLICINFO_CLICINTCTLBITS_OFFSET:  u32 = 21 as  u32;
 
-    pub const CLICINFO_NUM_TRIGGER_MASK:  u32 = 0x3f as  u32;
+    pub const CLICINFO_NUM_TRIGGER_MASK:  u32 = 0x81FFFFFF as  u32;
     pub const CLICINFO_NUM_TRIGGER_OFFSET:  u32 = 25 as  u32;
 
     /* CLIC enable mnxti irq forwarding logic */
@@ -72,9 +72,10 @@ pub mod addr {
         (0x1008 + 0x10 * id) as isize
     }
     pub const CLICINTATTR_SHV_BIT:  u32 = 0 as  u32;
-    pub const CLICINTATTR_TRIG_MASK:  u32 = 0x3 as  u32;
+    pub const CLICINTATTR_SHV_MASK:  u32 = 0xFFFFFFFE as  u32;
+    pub const CLICINTATTR_TRIG_MASK:  u32 = 0xFFFFFFF9 as  u32;
     pub const CLICINTATTR_TRIG_OFFSET:  u32 = 1 as  u32;
-    pub const CLICINTATTR_MODE_MASK:  u32 = 0x3 as  u32;
+    pub const CLICINTATTR_MODE_MASK:  u32 = 0xFFFFFF3F as  u32;
     pub const CLICINTATTR_MODE_OFFSET:  u32 = 6 as  u32;
 
     pub const TRIG_LEVEL:  u32 = 0 as  u32;
