@@ -1,6 +1,6 @@
 pub mod addresses {
 
-    struct MemoryMapper {
+    pub struct MemoryMapper {
         base_address: *mut u32,
     }
 
