@@ -137,11 +137,10 @@ default_start_trap:
 .global default_setup_interrupts
 
 default_setup_interrupts:
-    // Set trap handler
-    la t0, _start_trap
-    andi t0, t0, 0xc0
-    ori t0, t0, 0x3
-    csrw mtvec, t0
+	la t0, __clic_vector_table
+	or t0, t0, 1 
+	csrw mtvec, t0
+	csrw 0x307, t0 /* mtvt=0x307 */
     ret
 
 
