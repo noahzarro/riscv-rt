@@ -60,12 +60,15 @@ pub mod addr {
         (0x1000 + 0x10 * id) as isize
     }
     pub const CLICINTIP_CLICINTIP_BIT: u32 = 0 as u32;
+    pub const CLICINTIP_CLICINTIP_MASK: u32 = 0xFFFFFFFE;
 
     /* CLIC interrupt id enable */
     pub fn CLICINTIE_REG_OFFSET(id: u32) -> isize {
         (0x1004 + 0x10 * id) as isize
     }
     pub const CLICINTIE_CLICINTIE_BIT: u32 = 0 as u32;
+    pub const CLICINTIP_CLICINTIE_MASK: u32 = 0xFFFFFFFE;
+
 
     /* CLIC interrupt id attributes */
     pub fn CLICINTATTR_REG_OFFSET(id: u32) -> isize {
@@ -87,7 +90,7 @@ pub mod addr {
     pub fn CLICINTCTL_REG_OFFSET(id: u32) -> isize {
         (0x100c + 0x10 * id) as isize
     }
-    pub const CLICINTCTL_CLICINTCTL_MASK:  u32 = 0xff as  u32;
+    pub const CLICINTCTL_CLICINTCTL_MASK:  u32 = 0xFFFFFF00 as  u32;
     pub const CLICINTCTL_CLICINTCTL_OFFSET:  u32 = 0 as  u32;
 
     pub const CSR_MXNTI_ID:  u32 = 0x345 as  u32;
