@@ -35,6 +35,13 @@ pub mod addr {
                 (reg_value & mask) >> bitoffset
             }
         }
+
+        pub fn read_byte(&self, reg_offset: isize, mask: u8, bitoffset: u8) -> u8 {
+            unsafe {
+                let reg_value = core::ptr::read_volatile((self.base_address as *mut u8).offset(reg_offset));
+                (reg_value & mask) >> bitoffset
+            }
+        }
     }
 
     /* CLIC Configuration */
