@@ -217,7 +217,6 @@ __handle_clic_int:
 	sw t6, 60(sp)
 
 	la   t0, clic_isr_hook
-	lw   t0, 0(t0) /* load function pointer */
 
 	jalr t0 /* vector into hook */
 
