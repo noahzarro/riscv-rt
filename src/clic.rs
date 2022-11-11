@@ -77,7 +77,7 @@ pub mod addr {
         (0x1004 + 0x10 * id) as isize
     }
     pub const CLICINTIE_CLICINTIE_BIT: u8 = 0;
-    pub const CLICINTIP_CLICINTIE_MASK: u8 = 0xFE;
+    pub const CLICINTIE_CLICINTIE_MASK: u8 = 0xFE;
 
 
     /* CLIC interrupt id attributes */
