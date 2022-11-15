@@ -110,6 +110,22 @@ pub mod addr {
     pub const CLICINTCTL_CLICINTCTL_MASK:  u8 = 0x00;
     pub const CLICINTCTL_CLICINTCTL_OFFSET:  u8 = 0;
 
+    /* Timers */
+    pub const TIMER_TIMER0_REG_OFFSET: u32 = 0x1A103000;
+    pub const TIMER_TIMER1_REG_OFFSET: u32 = 0x1A103010;
+
+    pub const TIMER_CTRL0_REG_OFFSET:u32 = 0x1A103004;
+    pub const TIMER_CTRL1_REG_OFFSET:u32 = 0x1A103014;
+
+    pub const TIMER_CTRL_EN_BIT:u32 = 0;
+    pub const TIMER_CTRL_EN_MASK:u32 = 0xFFFFFFFE;
+
+    pub const TIMER_CTRL_PRE_OFFSET:u32 = 3;
+    pub const TIMER_CTRL_PRE_MASK:u32 = 0xFFFFFF38;
+
+    pub const TIMER_CMP0_REG_OFFSET: u32 = 0x1A103008;
+    pub const TIMER_CMP1_REG_OFFSET: u32 = 0x1A103018;
+
     pub const CSR_MXNTI_ID:  u32 = 0x345 as  u32;
     pub const MIE:  u32 = 8 as  u32;
 }
