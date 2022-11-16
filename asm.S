@@ -150,8 +150,8 @@ default_exception_handler:
 	j default_exception_handler
 software_handler:
 	j software_handler
-timer_handler:
-	j timer_handler
+default_timer_handler:
+	j default_timer_handler
 external_handler:
 	j external_handler
 __no_irq_handler:
@@ -169,11 +169,11 @@ __clic_vector_table:
 	j __no_irq_handler
 	j __no_irq_handler
 	j __no_irq_handler
-	j timer_handler
 	j __no_irq_handler
 	j __no_irq_handler
 	j __no_irq_handler
-	j external_handler
+	j __timer_handler_lo
+	j __timer_handler_hi
 	j __no_irq_handler
 	j __no_irq_handler
 	j __no_irq_handler
