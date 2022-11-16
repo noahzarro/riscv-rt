@@ -3,11 +3,11 @@ pub mod addr {
 
     /// agi
     pub struct MemoryMapper {
-        base_address: *mut u32,
+        base_address: *mut u8,
     }
 
     impl MemoryMapper {
-        pub fn new(base_address: *mut u32) -> Self{
+        pub fn new(base_address: *mut u8) -> Self{
             Self {
                 base_address: base_address,
             }
@@ -15,30 +15,30 @@ pub mod addr {
 
         pub fn write(&self, reg_offset: isize, mask: u32, bitoffset: u32, value: u32) {
             unsafe {
-                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset/4));
+                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset) as *mut u32);
                 let reg_value = (reg_value & mask) | (value << bitoffset);
-                core::ptr::write_volatile(self.base_address.offset(reg_offset), reg_value);
+                core::ptr::write_volatile(self.base_address.offset(reg_offset) as *mut u32, reg_value);
             }
         }
 
         pub fn write_byte(&self, reg_offset: isize, mask: u8, bitoffset: u8, value: u8) {
             unsafe {
-                let reg_value = core::ptr::read_volatile((self.base_address as *mut u8).offset(reg_offset));
+                let reg_value = core::ptr::read_volatile((self.base_address).offset(reg_offset));
                 let reg_value = (reg_value & mask) | (value << bitoffset);
-                core::ptr::write_volatile((self.base_address as *mut u8).offset(reg_offset), reg_value);
+                core::ptr::write_volatile((self.base_address).offset(reg_offset), reg_value);
             }
         }
 
         pub fn read(&self, reg_offset: isize, mask: u32, bitoffset: u32) -> u32 {
             unsafe {
-                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset/4));
+                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset) as *mut u32);
                 (reg_value & !mask) >> bitoffset
             }
         }
 
         pub fn read_byte(&self, reg_offset: isize, mask: u8, bitoffset: u8) -> u8 {
             unsafe {
-                let reg_value = core::ptr::read_volatile((self.base_address as *mut u8).offset(reg_offset));
+                let reg_value = core::ptr::read_volatile((self.base_address).offset(reg_offset));
                 (reg_value & !mask) >> bitoffset
             }
         }
