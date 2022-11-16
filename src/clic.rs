@@ -15,7 +15,7 @@ pub mod addr {
 
         pub fn write(&self, reg_offset: isize, mask: u32, bitoffset: u32, value: u32) {
             unsafe {
-                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset));
+                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset/4));
                 let reg_value = (reg_value & mask) | (value << bitoffset);
                 core::ptr::write_volatile(self.base_address.offset(reg_offset), reg_value);
             }
@@ -31,7 +31,7 @@ pub mod addr {
 
         pub fn read(&self, reg_offset: isize, mask: u32, bitoffset: u32) -> u32 {
             unsafe {
-                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset));
+                let reg_value = core::ptr::read_volatile(self.base_address.offset(reg_offset/4));
                 (reg_value & mask) >> bitoffset
             }
         }
