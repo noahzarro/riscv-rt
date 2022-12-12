@@ -466,6 +466,7 @@ pub extern "C" fn start_trap_rust(trap_frame: *const TrapFrame) {
         if cause.is_exception() {
             ExceptionHandler(&*trap_frame)
         } else {
+            #[cfg(not(feature = "clic"))]
             if cause.code() < __INTERRUPTS.len() {
                 let h = &__INTERRUPTS[cause.code()];
                 if h.reserved == 0 {
@@ -476,6 +477,8 @@ pub extern "C" fn start_trap_rust(trap_frame: *const TrapFrame) {
             } else {
                 DefaultHandler();
             }
+            #[cfg(feature = "clic")]
+            DefaultHandler();
         }
     }
 }
