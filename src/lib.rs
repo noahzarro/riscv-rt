@@ -503,6 +503,7 @@ pub fn DefaultInterruptHandler() {
 }
 
 /* Interrupts */
+#[cfg(not(feature = "clic"))]
 #[doc(hidden)]
 pub enum Interrupt {
     UserSoft,
@@ -516,8 +517,10 @@ pub enum Interrupt {
     MachineExternal,
 }
 
+#[cfg(not(feature = "clic"))]
 pub use self::Interrupt as interrupt;
 
+#[cfg(not(feature = "clic"))]
 extern "C" {
     fn UserSoft();
     fn SupervisorSoft();
@@ -530,12 +533,14 @@ extern "C" {
     fn MachineExternal();
 }
 
+#[cfg(not(feature = "clic"))]
 #[doc(hidden)]
 pub union Vector {
     pub handler: unsafe extern "C" fn(),
     pub reserved: usize,
 }
 
+#[cfg(not(feature = "clic"))]
 #[doc(hidden)]
 #[no_mangle]
 pub static __INTERRUPTS: [Vector; 12] = [
