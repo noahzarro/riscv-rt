@@ -204,3 +204,57 @@ pub fn pre_init(args: TokenStream, input: TokenStream) -> TokenStream {
     )
     .into()
 }
+
+
+
+
+#[proc_macro]
+pub fn interrupt_handler(input: TokenStream) -> TokenStream {
+    let f = parse_macro_input!(input as ItemFn);
+    // check that function has no arguments
+    if f.sig.inputs.len() != 0 {
+        return parse::Error::new(
+            f.sig.inputs.last().unwrap().span(),
+            "`#[interrupt]` handler function must not have any argument",
+        )
+        .to_compile_error()
+        .into();
+    }
+
+    // check that function does not return anything. Not returning is also an option
+    let valid_ret_type = match f.sig.output {
+        ReturnType::Default => true,
+        ReturnType::Type(_, ref ty) => match **ty {
+            Type::Tuple(ref tuple) => tuple.elems.is_empty(),
+            Type::Never(_) => true,
+            _ => false,
+        }
+    };
+    if !valid_ret_type {
+        return parse::Error::new(
+            f.sig.output.span(),
+            "`#[interrupt]` handler function must not return anything",
+        )
+        .to_compile_error()
+        .into();
+    }
+
+    let attrs = f.attrs;
+    let ident = f.sig.ident;
+    let block = f.block;
+    let handler_ident = ident.to_string() + "_handler";
+
+    quote!(
+        #(#attrs)*
+        pub unsafe fn #handler_ident #block
+
+        #[no_mangle]
+        pub unsafe fn #ident() {
+            asm!("nop");
+            #handler_ident();
+            asm!("nop");
+        }
+    )
+    .into()
+
+}
