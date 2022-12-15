@@ -375,7 +375,7 @@ use riscv::register::{mcause as xcause, mhartid, mtvec as xtvec, mtvec::TrapMode
 use riscv::register::{mtvt as xtvt, mtvec::SubMode as xSubMode};
 
 
-pub use riscv_rt_macros::{entry, pre_init};
+pub use riscv_rt_macros::{entry, pre_init, interrupt_handler};
 
 #[export_name = "error: riscv-rt appears more than once in the dependency graph"]
 #[doc(hidden)]
