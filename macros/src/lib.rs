@@ -242,7 +242,7 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
     let attrs = f.attrs;
     let ident = f.sig.ident;
     let block = f.block;
-    let handler_ident = ident.to_string() + "_handler";
+    let handler_ident = format_ident!("{}_handler", ident);
 
     quote!(
         #(#attrs)*
