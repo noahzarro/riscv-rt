@@ -359,11 +359,19 @@
 #![no_std]
 #![deny(missing_docs)]
 
+#[cfg(feature = "clic")]
+use riscv_clic as riscv;
+
 #[cfg(feature = "s-mode")]
 use riscv::register::{scause as xcause, stvec as xtvec, stvec::TrapMode as xTrapMode};
 
 #[cfg(not(feature = "s-mode"))]
 use riscv::register::{mcause as xcause, mhartid, mtvec as xtvec, mtvec::TrapMode as xTrapMode};
+
+// TODO: enable this for s-mode
+#[cfg(feature = "clic")]
+use riscv::register::{mtvt as xtvt, mtvec::SubMode as xSubMode};
+
 
 pub use riscv_rt_macros::{entry, pre_init};
 
@@ -592,14 +600,32 @@ pub extern "Rust" fn default_mp_hook(hartid: usize) -> bool {
     }
 }
 
-/// Default implementation of `_setup_interrupts` that sets `mtvec`/`stvec` to a trap handler address.
+/// Default implementation of `_setup_interrupts` for CLINT that sets `mtvec`/`stvec` to a trap handler address.
 #[doc(hidden)]
 #[no_mangle]
 #[rustfmt::skip]
+#[cfg(not(feature = "clic"))]
 pub unsafe extern "Rust" fn default_setup_interrupts() {
-    extern "C" {
-        fn _start_trap();
+    {
+        extern "C" {
+            fn _start_trap();
+        }   
+        xtvec::write(_start_trap as usize, xTrapMode::Direct);
     }
+}
 
-    xtvec::write(_start_trap as usize, xTrapMode::Direct);
+/// Default implementation of `_setup_interrupts` for CLIC that
+/// 
+#[doc(hidden)]
+#[no_mangle]
+#[rustfmt::skip]
+#[cfg(feature = "clic")]
+pub unsafe extern "Rust" fn default_setup_interrupts() {
+    {
+        extern "C" {
+            fn _start_trap();
+        }   
+        xtvec::write(_start_trap as usize, xSubMode::Default, xTrapMode::Clic);
+        xtvt::write_addr(1);
+    }
 }

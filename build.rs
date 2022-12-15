@@ -25,6 +25,10 @@ fn main() {
         fs::copy(&archive, out_dir.join(format!("lib{}.a", name))).unwrap();
         println!("cargo:rerun-if-changed={}", archive);
         println!("cargo:rustc-link-lib=static={}", name);
+
+        if cfg!(feature = "clic") {
+            println!("cargo:rustc-link-arg=-DCLIC");
+        }
     }
 
     // Put the linker script somewhere the linker can find it

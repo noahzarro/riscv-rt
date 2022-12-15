@@ -59,6 +59,12 @@ SECTIONS
     *(.trap.rust);
 
     *(.text .text.*);
+
+    #if defined(CLIC)
+    . = ALIGN(64);
+    *(.interrupt_vector);
+    #endif
+
   } > REGION_TEXT
 
   .rodata : ALIGN(4)
