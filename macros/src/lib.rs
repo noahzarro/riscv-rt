@@ -248,17 +248,15 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
         #(#attrs)*
         pub unsafe fn #handler_ident() #block
 
+        #[no_mangle]
+        pub unsafe fn #ident() {
+            asm!("nop");
+            #handler_ident();
+            asm!("nop");
+        } 
 
     )
     .into()
 
 }
 
-
-/*
-        #[no_mangle]
-        pub unsafe fn #ident() {
-            asm!("nop");
-            #handler_ident();
-            asm!("nop");
-        } */
