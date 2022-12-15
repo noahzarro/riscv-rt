@@ -627,8 +627,13 @@ pub unsafe extern "Rust" fn default_setup_interrupts() {
         extern "C" {
             fn _start_trap();
         }   
+
+        extern {
+            static interrupt_vector: usize;
+        }
+
         xtvec::write(_start_trap as usize, xSubMode::Default, xTrapMode::Clic);
-        xtvt::write_addr(1);
+        xtvt::write_addr(*(&interrupt_vector));
     }
 }
 
