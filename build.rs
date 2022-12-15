@@ -11,6 +11,7 @@ fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let name = env::var("CARGO_PKG_NAME").unwrap();
 
+    /*
     if target.starts_with("riscv") {
         let mut target = Target::from_target_str(&target);
         target.retain_extensions("imfdc");
@@ -25,11 +26,12 @@ fn main() {
         fs::copy(&archive, out_dir.join(format!("lib{}.a", name))).unwrap();
         println!("cargo:rerun-if-changed={}", archive);
         println!("cargo:rustc-link-lib=static={}", name);
-
+        
         if cfg!(feature = "clic") {
             println!("cargo:rustc-link-arg=-DCLIC");
         }
     }
+    */
 
     // Put the linker script somewhere the linker can find it
     fs::write(out_dir.join("link.x"), include_bytes!("link.x")).unwrap();

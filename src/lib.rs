@@ -359,6 +359,8 @@
 #![no_std]
 #![deny(missing_docs)]
 
+use core::arch::global_asm;
+
 #[cfg(feature = "clic")]
 use riscv_clic as riscv;
 
@@ -629,3 +631,5 @@ pub unsafe extern "Rust" fn default_setup_interrupts() {
         xtvt::write_addr(1);
     }
 }
+
+global_asm!(include_str!("asm.S"));
