@@ -62,7 +62,7 @@ SECTIONS
 
     #if defined(CLIC)
     . = ALIGN(64);
-    *(.interrupt_vector);
+    *(.text.interrupt_vector);
     #endif
 
   } > REGION_TEXT
