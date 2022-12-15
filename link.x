@@ -58,12 +58,13 @@ SECTIONS
     *(.trap);
     *(.trap.rust);
 
-    *(.text .text.*);
-
     #if defined(CLIC)
     . = ALIGN(64);
-    *(.interrupt_vector);
+    *(.text.interrupt_vector);
     #endif
+    
+    *(.text .text.*);
+
 
   } > REGION_TEXT
 
