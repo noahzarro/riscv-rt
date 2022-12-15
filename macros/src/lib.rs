@@ -239,13 +239,13 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
         .into();
     }
 
-    let attrs = f.attrs;
+    //let attrs = f.attrs;
     let ident = f.sig.ident;
     let block = f.block;
     //let handler_ident = format_ident!("{}_handler", ident);
 
+    //#(#attrs)*
     quote!(
-        #(#attrs)*
         pub unsafe fn #ident #block
 
 
