@@ -250,6 +250,7 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
 
         #[no_mangle]
         pub unsafe fn #ident() {
+            use core::arch::asm;
             asm!("nop");
             #handler_ident();
             asm!("nop");
