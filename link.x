@@ -60,9 +60,9 @@ SECTIONS
 
     #if defined(CLIC)
     . = ALIGN(64);
-    *(.text.interrupt_vector);
+    KEEP(*(.text.interrupt_vector));
     #endif
-    
+
     *(.text .text.*);
 
 
