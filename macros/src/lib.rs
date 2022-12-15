@@ -208,8 +208,8 @@ pub fn pre_init(args: TokenStream, input: TokenStream) -> TokenStream {
 
 
 
-#[proc_macro]
-pub fn interrupt_handler(input: TokenStream) -> TokenStream {
+#[proc_macro_attribute]
+pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream {
     let f = parse_macro_input!(input as ItemFn);
     // check that function has no arguments
     if f.sig.inputs.len() != 0 {
