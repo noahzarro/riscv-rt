@@ -631,5 +631,3 @@ pub unsafe extern "Rust" fn default_setup_interrupts() {
         xtvt::write_addr(1);
     }
 }
-
-global_asm!(include_str!("asm.S"));
