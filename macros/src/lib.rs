@@ -293,10 +293,8 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
         #[no_mangle]
         pub unsafe fn #handler_ident() #block
 
-        {
-            use core::arch::global_asm;
-            global_asm!(#assembly_string);     
-        }
+        use core::arch::global_asm;
+        global_asm!(#assembly_string);     
 
     )
     .into()
