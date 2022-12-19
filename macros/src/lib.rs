@@ -244,6 +244,7 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
     let block = f.block;
     let ident_string = ident.to_string();
     let handler_string = ident_string.clone() + "_handler";
+    let handler_ident = format_ident!("{handler_string}");
     let assembly_string = format!(
     ".global
     .{ident_string}
@@ -289,14 +290,14 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
 
     quote!(
         #(#attrs)*
-        pub unsafe fn #handler_string() #block
+        pub unsafe fn #handler_ident() #block
 
         
-            use core::arch::asm;
-            use core::arch::global_asm;
-            global_asm!(#assembly_string);
-            asm!("nop");
-            asm!("nop");
+        use core::arch::asm;
+        use core::arch::global_asm;
+        global_asm!(#assembly_string);
+        asm!("nop");
+        asm!("nop");
         
 
     )
