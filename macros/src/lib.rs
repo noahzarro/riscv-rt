@@ -290,6 +290,7 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
 
     quote!(
         #(#attrs)*
+        #[no_mangle]
         pub unsafe fn #handler_ident() #block
 
         use core::arch::global_asm;
