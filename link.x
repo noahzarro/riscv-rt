@@ -59,7 +59,7 @@ SECTIONS
     *(.trap.rust);
 
     #if defined(CLIC)
-    . = ALIGN(64);
+    . = ALIGN(1024);
     KEEP(*(.text.interrupt_vector));
     #endif
 
