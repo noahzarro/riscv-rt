@@ -247,7 +247,7 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
     let handler_ident = format_ident!("{handler_string}");
     let assembly_string = format!(
     ".global
-    .{ident_string}
+    {ident_string}:
     addi sp, sp, -(4 * 16)
     sw ra, 0(sp)
     sw t0, 4(sp)
