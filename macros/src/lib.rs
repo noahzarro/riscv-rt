@@ -218,14 +218,14 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
             0 => 
             return parse::Error::new(
                 f.span(),
-                "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                "Missing argument: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
             )
             .to_compile_error()
             .into(),
             _default => 
             return parse::Error::new(
                 args.last().unwrap().span(),
-                "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                "Too many arguments: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
             )
             .to_compile_error()
             .into(),
@@ -239,7 +239,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
             syn::Lit::Int(i) => i,
             default => return parse::Error::new(
                 default.span(),
-                "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
             )
             .to_compile_error()
             .into(),
@@ -247,7 +247,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
         default => 
         return parse::Error::new(
             default.span(),
-            "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+            "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
         )
         .to_compile_error()
         .into(),
