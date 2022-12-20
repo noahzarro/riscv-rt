@@ -247,7 +247,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
         syn::NestedMeta::Meta(m) => match m {
             syn::Meta::Path(p) => match p.get_ident() {
                 
-                Some(i) => return parse::Error::new(i.span(), "TODO: remove").to_compile_error().into(), // TODO return Ident,
+                Some(i) => return parse::Error::new(i.span(), "TODO: remove").to_compile_error().into(), // TODO return Ident
                 None => return parse::Error::new(
                     p.span(),
                     "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
@@ -327,9 +327,19 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     sw t4, 52(sp)
     sw t5, 56(sp)
     sw t6, 60(sp)
+    csrr t0, mcause
+    csrr t1, mepc
+    sw t0, 64(sp)
+    sw t1, 68(sp)
+    #csrsi mstatus, 8 /* enable global interrupts*/
 
     j {handler_string}
 
+    #csrci mstatus, 8 /* disable global interrupts*/
+    lw t0, 64(sp)
+    lw t1, 68(sp)
+    csrw mcause, t0
+    csrw mepc, t1
     lw ra, 0(sp)
     lw t0, 4(sp)
     lw t1, 8(sp)
