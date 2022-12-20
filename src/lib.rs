@@ -623,6 +623,7 @@ pub unsafe extern "Rust" fn default_setup_interrupts() {
 #[rustfmt::skip]
 #[cfg(feature = "clic")]
 pub unsafe extern "Rust" fn default_setup_interrupts() {
+
     {
         extern "C" {
             fn _start_trap();
@@ -633,7 +634,8 @@ pub unsafe extern "Rust" fn default_setup_interrupts() {
         }
 
         xtvec::write(_start_trap as usize, xSubMode::Default, xTrapMode::Clic);
-        xtvt::write_addr(*(&interrupt_vector));
+        let interrupt_vector_ptr:*const usize = &interrupt_vector;
+        xtvt::write_addr(interrupt_vector_ptr as usize);
     }
 }
 
