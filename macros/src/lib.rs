@@ -331,11 +331,11 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     csrr t1, mepc
     sw t0, 64(sp)
     sw t1, 68(sp)
-    #csrsi mstatus, 8 /* enable global interrupts*/
+    csrsi mstatus, 8 /* enable global interrupts*/
 
     j {handler_string}
 
-    #csrci mstatus, 8 /* disable global interrupts*/
+    csrci mstatus, 8 /* disable global interrupts*/
     lw t0, 64(sp)
     lw t1, 68(sp)
     csrw mcause, t0
