@@ -285,8 +285,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let ident = f.sig.ident;
     let block = f.block;
     let wrapper_ident = "int_".to_owned() + &interrupt_number.to_string();
-    let ident_string = ident.to_string();
-    let handler_string = ident_string.clone() + "_handler";
+    let handler_string = ident.to_string();
     let handler_ident = format_ident!("{handler_string}");
     let assembly_string = format!(
     ".global {wrapper_ident}
