@@ -215,7 +215,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
 
     if args.len() != 1 {
         return parse::Error::new(
-            f.sig.inputs.last().unwrap().span(),
+            args[0].span(),
             "`#[interrupt]` attribute must have exactly one argument",
         )
         .to_compile_error()
