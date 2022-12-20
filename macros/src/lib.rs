@@ -214,12 +214,22 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let args = parse_macro_input!(args as AttributeArgs);
 
     if args.len() != 1 {
-        return parse::Error::new(
-            f.span(),
-            "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
-        )
-        .to_compile_error()
-        .into();
+        match args.len() {
+            0 => 
+            return parse::Error::new(
+                f.span(),
+                "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+            )
+            .to_compile_error()
+            .into(),
+            _default => 
+            return parse::Error::new(
+                args.last().unwrap().span(),
+                "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+            )
+            .to_compile_error()
+            .into(),
+        }
     }
 
     // parse interrupt number
