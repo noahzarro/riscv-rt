@@ -245,21 +245,19 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
             .into(),
         },
         syn::NestedMeta::Meta(m) => match m {
-            syn::Meta::Path(p) => return parse::Error::new(
-                p.span(),
-                "path",
-            )
-            .to_compile_error()
-            .into(),
-            syn::Meta::List(l) => return parse::Error::new(
-                l.span(),
-                "list",
-            )
-            .to_compile_error()
-            .into(),
-            syn::Meta::NameValue(n) => return parse::Error::new(
-                n.span(),
-                "nameValue",
+            syn::Meta::Path(p) => match p.get_ident() {
+                
+                Some(i) => return parse::Error::new(i.span(), "TODO: remove").to_compile_error().into(), // TODO return Ident,
+                None => return parse::Error::new(
+                    p.span(),
+                    "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                )
+                .to_compile_error()
+                .into(),
+            },
+            default => return parse::Error::new(
+                default.span(),
+                "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
             )
             .to_compile_error()
             .into(),
