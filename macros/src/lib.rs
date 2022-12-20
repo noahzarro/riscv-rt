@@ -215,8 +215,8 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
 
     if args.len() != 1 {
         return parse::Error::new(
-            args[0].span(),
-            "`#[interrupt]` attribute must have exactly one argument",
+            f.span(),
+            "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
         )
         .to_compile_error()
         .into();
@@ -227,17 +227,17 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let interrupt_number = match arg {
         syn::NestedMeta::Lit(l) => match l {
             syn::Lit::Int(i) => i,
-            _ => return parse::Error::new(
-                f.sig.inputs.last().unwrap().span(),
-                "`#[interrupt]` attribute must have an int argument to specify the interrupt number",
+            default => return parse::Error::new(
+                default.span(),
+                "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
             )
             .to_compile_error()
             .into(),
         },
-        _ => 
+        default => 
         return parse::Error::new(
-            f.sig.inputs.last().unwrap().span(),
-            "`#[interrupt]` attribute must have an int argument to specify the interrupt number",
+            default.span(),
+            "`#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
         )
         .to_compile_error()
         .into(),
@@ -247,7 +247,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     if f.sig.inputs.len() != 0 {
         return parse::Error::new(
             f.sig.inputs.last().unwrap().span(),
-            "`#[interrupt]` handler function must not have any argument",
+            "`#[interrupt(int_nr)]` handler function must not have any argument",
         )
         .to_compile_error()
         .into();
@@ -265,7 +265,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     if !valid_ret_type {
         return parse::Error::new(
             f.sig.output.span(),
-            "`#[interrupt]` handler function must not return anything",
+            "`#[interrupt(int_nr)]` handler function must not return anything",
         )
         .to_compile_error()
         .into();
