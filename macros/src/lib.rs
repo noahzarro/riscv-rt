@@ -244,6 +244,27 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
             .to_compile_error()
             .into(),
         },
+        syn::NestedMeta::Meta(m) => match m {
+            syn::Meta::Path(p) => return parse::Error::new(
+                p.span(),
+                "path",
+            )
+            .to_compile_error()
+            .into(),
+            syn::Meta::List(l) => return parse::Error::new(
+                l.span(),
+                "list",
+            )
+            .to_compile_error()
+            .into(),
+            syn::Meta::NameValue(n) => return parse::Error::new(
+                n.span(),
+                "nameValue",
+            )
+            .to_compile_error()
+            .into(),
+        }
+        /*
         default => 
         return parse::Error::new(
             default.span(),
@@ -251,6 +272,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
         )
         .to_compile_error()
         .into(),
+        */
     };
 
     // check that function has no arguments
