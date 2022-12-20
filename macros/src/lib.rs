@@ -9,7 +9,7 @@ extern crate proc_macro2;
 extern crate syn;
 
 use proc_macro2::Span;
-use syn::{parse, spanned::Spanned, FnArg, ItemFn, PathArguments, ReturnType, Type, Visibility};
+use syn::{parse, spanned::Spanned, FnArg, ItemFn, PathArguments, ReturnType, Type, Visibility, AttributeArgs};
 
 use proc_macro::TokenStream;
 
@@ -209,8 +209,40 @@ pub fn pre_init(args: TokenStream, input: TokenStream) -> TokenStream {
 
 
 #[proc_macro_attribute]
-pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let f = parse_macro_input!(input as ItemFn);
+    let args = parse_macro_input!(args as AttributeArgs);
+
+    if args.len() != 1 {
+        return parse::Error::new(
+            f.sig.inputs.last().unwrap().span(),
+            "`#[interrupt]` attribute must have exactly one argument",
+        )
+        .to_compile_error()
+        .into();
+    }
+
+    // parse interrupt number
+    let arg = &args[0];
+    let interrupt_number = match arg {
+        syn::NestedMeta::Lit(l) => match l {
+            syn::Lit::Int(i) => i,
+            _ => return parse::Error::new(
+                f.sig.inputs.last().unwrap().span(),
+                "`#[interrupt]` attribute must have an int argument to specify the interrupt number",
+            )
+            .to_compile_error()
+            .into(),
+        },
+        _ => 
+        return parse::Error::new(
+            f.sig.inputs.last().unwrap().span(),
+            "`#[interrupt]` attribute must have an int argument to specify the interrupt number",
+        )
+        .to_compile_error()
+        .into(),
+    };
+
     // check that function has no arguments
     if f.sig.inputs.len() != 0 {
         return parse::Error::new(
@@ -242,12 +274,13 @@ pub fn interrupt_handler(_args: TokenStream, input: TokenStream) -> TokenStream 
     let attrs = f.attrs;
     let ident = f.sig.ident;
     let block = f.block;
+    let wrapper_ident = "int_".to_owned() + &interrupt_number.to_string();
     let ident_string = ident.to_string();
     let handler_string = ident_string.clone() + "_handler";
     let handler_ident = format_ident!("{handler_string}");
     let assembly_string = format!(
-    ".global {ident_string}
-    {ident_string}:
+    ".global {wrapper_ident}
+    {wrapper_ident}:
     addi sp, sp, -(4 * 16)
     sw ra, 0(sp)
     sw t0, 4(sp)
