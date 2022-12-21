@@ -358,6 +358,8 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     mret
     ");
 
+    println!("{:?}", assembly_string);
+
     quote!(
         #(#attrs)*
         #[no_mangle]
