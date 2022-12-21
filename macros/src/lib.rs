@@ -213,23 +213,16 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let f = parse_macro_input!(input as ItemFn);
     let args = parse_macro_input!(args as AttributeArgs);
 
-    if args.len() != 1 {
-        match args.len() {
-            0 => 
-            return parse::Error::new(
-                f.span(),
-                "Missing argument: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
-            )
-            .to_compile_error()
-            .into(),
-            _default => 
-            return parse::Error::new(
-                args.last().unwrap().span(),
-                "Too many arguments: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
-            )
-            .to_compile_error()
-            .into(),
-        }
+    let int_nr_provided = !args.len() == 0;
+
+    // at most one argument should be provided
+    if args.len() > 1 { 
+        return parse::Error::new(
+            f.span(),
+            "Missing argument: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+        )
+        .to_compile_error()
+        .into();
     }
 
     // parse interrupt number
@@ -304,12 +297,12 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let attrs = f.attrs;
     let ident = f.sig.ident;
     let block = f.block;
-    let wrapper_ident = "int_".to_owned() + &interrupt_number.to_string();
+    let wrapper_ident_string = if int_nr_provided { "int_".to_owned() + &interrupt_number.to_string() } else { ident.to_string() };
     let handler_string = ident.to_string();
-    let handler_ident = format_ident!("{handler_string}");
+    let handler_ident = format_ident!("{handler_string}_handler");
     let assembly_string = format!(
-    ".global {wrapper_ident}
-    {wrapper_ident}:
+    ".global {wrapper_ident_string}
+    {wrapper_ident_string}:
     addi sp, sp, -(4 * 16)
     sw ra, 0(sp)
     sw t0, 4(sp)
@@ -333,7 +326,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     sw t1, 68(sp)
     csrsi mstatus, 8 /* enable global interrupts*/
 
-    j {handler_string}
+    j {handler_ident}
 
     csrci mstatus, 8 /* disable global interrupts*/
     lw t0, 64(sp)
