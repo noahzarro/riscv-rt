@@ -225,9 +225,11 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
         .into();
     }
 
-    // parse interrupt number
-    let arg = &args[0];
-    let interrupt_number = match arg {
+    let interrupt_number = if int_nr_provided { 
+        
+        // parse interrupt number
+        let arg = &args[0];
+        match arg {
         syn::NestedMeta::Lit(l) => match l {
             syn::Lit::Int(i) => i,
             default => return parse::Error::new(
@@ -264,7 +266,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
         .to_compile_error()
         .into(),
         */
-    };
+    }.to_string()} else {"".to_string()};
 
     // check that function has no arguments
     if f.sig.inputs.len() != 0 {
