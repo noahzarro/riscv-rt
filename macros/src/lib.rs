@@ -213,7 +213,8 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let f = parse_macro_input!(input as ItemFn);
     let args = parse_macro_input!(args as AttributeArgs);
 
-    println!("{:?}", args);
+    println!("args:{:?}", args);
+    println!("args.len(): {:?}", args.len());
 
     let int_nr_provided = !args.len() == 0;
 
