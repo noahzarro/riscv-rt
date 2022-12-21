@@ -216,7 +216,10 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     println!("args:{:?}", args);
     println!("args.len(): {:?}", args.len());
 
-    let int_nr_provided = !args.len() == 0;
+    let int_nr_provided = args.len() != 0;
+
+    println!("int_nr_provided:{:?}", int_nr_provided);
+
 
     // at most one argument should be provided
     if args.len() > 1 { 
