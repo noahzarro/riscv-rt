@@ -213,13 +213,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let f = parse_macro_input!(input as ItemFn);
     let args = parse_macro_input!(args as AttributeArgs);
 
-    println!("args:{:?}", args);
-    println!("args.len(): {:?}", args.len());
-
     let int_nr_provided = args.len() != 0;
-
-    println!("int_nr_provided:{:?}", int_nr_provided);
-
 
     // at most one argument should be provided
     if args.len() > 1 { 
@@ -360,8 +354,6 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     addi sp, sp, (4 * 16)
     mret
     ");
-
-    println!("{:?}", assembly_string);
 
     quote!(
         #(#attrs)*
