@@ -37,5 +37,5 @@ fn main() {
     fs::write(out_dir.join("link.x"), include_bytes!("link.x")).unwrap();
     println!("cargo:rustc-link-search={}", out_dir.display());
     println!("cargo:rerun-if-changed=link.x");
-    println!("cargo:rustc-link-arg=-Tlink.x");
+    println!("cargo:rustc-link-arg=Tlink.x");
 }
