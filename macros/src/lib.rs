@@ -207,13 +207,14 @@ pub fn pre_init(args: TokenStream, input: TokenStream) -> TokenStream {
 
 
 
-
+/// There are three ways to connect the handler function to the actual interrupt:
+/// 1. use no argument, provide a linker script entry with `PROVIDE(int_<your_interrupt_number> = <your_handler_name>)`
+/// 2. use a literal integer as argument. Handler is then mapped to this interrupt number.
+/// 3. use an interrupt enum from the PAC crate. Handler is mapped to this interrupt.
 #[proc_macro_attribute]
 pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let f = parse_macro_input!(input as ItemFn);
     let args = parse_macro_input!(args as AttributeArgs);
-
-    let int_nr_provided = args.len() != 0;
 
     // at most one argument should be provided
     if args.len() > 1 { 
@@ -225,48 +226,52 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
         .into();
     }
 
-    let interrupt_number = if int_nr_provided { 
+    let attrs = f.attrs;
+    let ident = f.sig.ident;
+    let block = f.block;
+    let ident_string = ident.to_string();
+
+    let wrapper_ident_string = {
         
-        // parse interrupt number
-        let arg = &args[0];
+        // check on number of arguments
+        let arg = args.get(0);
         match arg {
-        syn::NestedMeta::Lit(l) => match l {
-            syn::Lit::Int(i) => i,
-            default => return parse::Error::new(
-                default.span(),
-                "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
-            )
-            .to_compile_error()
-            .into(),
-        },
-        syn::NestedMeta::Meta(m) => match m {
-            syn::Meta::Path(p) => match p.get_ident() {
-                
-                Some(i) => return parse::Error::new(i.span(), "TODO: remove").to_compile_error().into(), // TODO return Ident
-                None => return parse::Error::new(
-                    p.span(),
-                    "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
-                )
-                .to_compile_error()
-                .into(),
-            },
-            default => return parse::Error::new(
-                default.span(),
-                "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
-            )
-            .to_compile_error()
-            .into(),
+            // an argument exists
+            Some(a) =>
+            match a {
+                syn::NestedMeta::Lit(l) => match l {
+                    // option to supply an integer. It is treated the interrupt number, wrapper named after int_<number>
+                    syn::Lit::Int(i) => "int_".to_owned() + &i.to_string(),
+                    default => return parse::Error::new(
+                            default.span(),
+                            "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                        )
+                        .to_compile_error()
+                        .into(),
+                    },
+                    syn::NestedMeta::Meta(m) => match m {
+                        // option to supply an identifier (e.g. an Enum name) wrapper is named after identifier
+                        syn::Meta::Path(p) => match p.get_ident() {
+                            Some(i) => i.to_string(),
+                            None => return parse::Error::new(
+                                p.span(),
+                                "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                            )
+                            .to_compile_error()
+                            .into(),
+                        },
+                        default => return parse::Error::new(
+                            default.span(),
+                            "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                        )
+                        .to_compile_error()
+                        .into(),
+                    }
+            }
+            // no argument exist -> wrapper is named after original function
+            None => ident_string.clone()
         }
-        /*
-        default => 
-        return parse::Error::new(
-            default.span(),
-            "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
-        )
-        .to_compile_error()
-        .into(),
-        */
-    }.to_string()} else {"".to_string()};
+    };
 
     // check that function has no arguments
     if f.sig.inputs.len() != 0 {
@@ -296,12 +301,8 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
         .into();
     }
 
-    let attrs = f.attrs;
-    let ident = f.sig.ident;
-    let block = f.block;
-    let wrapper_ident_string = if int_nr_provided { "int_".to_owned() + &interrupt_number.to_string() } else { ident.to_string() };
-    let handler_string = ident.to_string();
-    let handler_ident = format_ident!("{handler_string}_handler");
+
+    let handler_ident = format_ident!("{}_handler", ident_string);
     let assembly_string = format!(
     ".global {wrapper_ident_string}
     {wrapper_ident_string}:
