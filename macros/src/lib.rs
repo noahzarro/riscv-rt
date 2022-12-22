@@ -220,7 +220,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     if args.len() > 1 { 
         return parse::Error::new(
             f.span(),
-            "Missing argument: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+            "Too many arguments: `#[interrupt(int_nr)]` attribute must have at max one argument",
         )
         .to_compile_error()
         .into();
@@ -244,28 +244,28 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
                     syn::Lit::Int(i) => "int_".to_owned() + &i.to_string(),
                     default => return parse::Error::new(
                             default.span(),
-                            "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                            "Wrong type: `#[interrupt(int_nr)]` attribute must provide an integer as an argument",
                         )
                         .to_compile_error()
                         .into(),
                     },
-                    syn::NestedMeta::Meta(m) => match m {
-                        // option to supply an identifier (e.g. an Enum name) wrapper is named after identifier
-                        syn::Meta::Path(p) => match p.get_ident() {
-                            Some(i) => i.to_string(),
-                            None => return parse::Error::new(
-                                p.span(),
-                                "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
-                            )
-                            .to_compile_error()
-                            .into(),
-                        },
-                        default => return parse::Error::new(
-                            default.span(),
-                            "Wrong type: `#[interrupt(int_nr)]` attribute must have exactly one argument of type int describing the interrupt number",
+                syn::NestedMeta::Meta(m) => match m {
+                    // option to supply an identifier (e.g. an Enum name) wrapper is named after identifier
+                    syn::Meta::Path(p) => match p.get_ident() {
+                        Some(i) => i.to_string(),
+                        None => return parse::Error::new(
+                            p.span(),
+                            "Wrong type: `#[interrupt(identifier)]` attribute must provide a single enum value specifying an interrupt from the PAC crate",
                         )
                         .to_compile_error()
                         .into(),
+                    },
+                    default => return parse::Error::new(
+                        default.span(),
+                        "Wrong type: `#[interrupt(..)]` attribute must have either no or one argument of type Int literal or Enum identifier",
+                    )
+                    .to_compile_error()
+                    .into(),
                     }
             }
             // no argument exist -> wrapper is named after original function
@@ -277,7 +277,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     if f.sig.inputs.len() != 0 {
         return parse::Error::new(
             f.sig.inputs.last().unwrap().span(),
-            "`#[interrupt(int_nr)]` handler function must not have any argument",
+            "`#[interrupt(..)]` handler function must not have any argument",
         )
         .to_compile_error()
         .into();
@@ -295,7 +295,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     if !valid_ret_type {
         return parse::Error::new(
             f.sig.output.span(),
-            "`#[interrupt(int_nr)]` handler function must not return anything",
+            "`#[interrupt(..)]` handler function must not return anything",
         )
         .to_compile_error()
         .into();
