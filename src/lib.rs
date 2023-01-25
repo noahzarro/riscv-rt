@@ -362,17 +362,21 @@
 use core::arch::global_asm;
 
 #[cfg(feature = "clic")]
-use riscv_clic as riscv;
+use riscv_clic as riscv_crate;
+
+#[cfg(not(feature = "clic"))]
+use ::riscv as riscv_crate;
+
 
 #[cfg(feature = "s-mode")]
-use riscv::register::{scause as xcause, stvec as xtvec, stvec::TrapMode as xTrapMode};
+use riscv_crate::register::{scause as xcause, stvec as xtvec, stvec::TrapMode as xTrapMode};
 
 #[cfg(not(feature = "s-mode"))]
-use riscv::register::{mcause as xcause, mhartid, mtvec as xtvec, mtvec::TrapMode as xTrapMode};
+use riscv_crate::register::{mcause as xcause, mhartid, mtvec as xtvec, mtvec::TrapMode as xTrapMode};
 
 // TODO: enable this for s-mode
 #[cfg(feature = "clic")]
-use riscv::register::{mtvt as xtvt, mtvec::SubMode as xSubMode};
+use riscv_crate::register::{mtvt as xtvt, mtvec::SubMode as xSubMode};
 
 
 pub use riscv_rt_macros::{entry, pre_init, interrupt_handler};

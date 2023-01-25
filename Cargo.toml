@@ -16,7 +16,7 @@ clic = ["riscv-clic/clic"]
 
 [dependencies]
 r0 = "1.0.0"
-#riscv = "0.8"
+riscv = "0.8"
 riscv-clic = {git = "https://github.com/noahzarro/riscv-clic.git", features=["critical-section-single-hart"]}
 riscv-rt-macros = { path = "macros", version = "0.2.0" }
 
