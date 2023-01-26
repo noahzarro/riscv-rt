@@ -306,7 +306,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let assembly_string = format!(
     ".global {wrapper_ident_string}
     {wrapper_ident_string}:
-    addi sp, sp, -(4 * 18)
+    addi sp, sp, -(4 * 32)
     sw ra, 0(sp)
     sw t0, 4(sp)
     sw t1, 8(sp)
@@ -352,7 +352,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     lw t4, 52(sp)
     lw t5, 56(sp)
     lw t6, 60(sp)
-    addi sp, sp, (4 * 18)
+    addi sp, sp, (4 * 32)
     mret
     ");
 
