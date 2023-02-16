@@ -13,6 +13,7 @@ edition = "2018"
 [features]
 s-mode = []
 clic = ["riscv-clic/clic"]
+nxti = []
 
 [dependencies]
 r0 = "1.0.0"

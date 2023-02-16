@@ -9,7 +9,10 @@ extern crate proc_macro2;
 extern crate syn;
 
 use proc_macro2::Span;
-use syn::{parse, spanned::Spanned, FnArg, ItemFn, PathArguments, ReturnType, Type, Visibility, AttributeArgs};
+use syn::{
+    parse, spanned::Spanned, AttributeArgs, FnArg, ItemFn, PathArguments, ReturnType,
+    Type, Visibility,
+};
 
 use proc_macro::TokenStream;
 
@@ -205,8 +208,6 @@ pub fn pre_init(args: TokenStream, input: TokenStream) -> TokenStream {
     .into()
 }
 
-
-
 /// There are three ways to connect the handler function to the actual interrupt:
 /// 1. use no argument, provide a linker script entry with `PROVIDE(int_<your_interrupt_number> = <your_handler_name>)`
 /// 2. use a literal integer as argument. Handler is then mapped to this interrupt number.
@@ -217,7 +218,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let args = parse_macro_input!(args as AttributeArgs);
 
     // at most one argument should be provided
-    if args.len() > 1 { 
+    if args.len() > 1 {
         return parse::Error::new(
             f.span(),
             "Too many arguments: `#[interrupt(int_nr)]` attribute must have at max one argument",
@@ -232,7 +233,6 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     let ident_string = ident.to_string();
 
     let wrapper_ident_string = {
-        
         // check on number of arguments
         let arg = args.get(0);
         match arg {
@@ -290,7 +290,7 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
             Type::Tuple(ref tuple) => tuple.elems.is_empty(),
             Type::Never(_) => true,
             _ => false,
-        }
+        },
     };
     if !valid_ret_type {
         return parse::Error::new(
@@ -301,10 +301,10 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
         .into();
     }
 
-
     let handler_ident = format_ident!("{}_handler", ident_string);
+    let wrapper_ident = format_ident!("{}", wrapper_ident_string);
     let assembly_string = format!(
-    ".global {wrapper_ident_string}
+        ".global {wrapper_ident_string}
     {wrapper_ident_string}:
     addi sp, sp, -(4 * 32)
     sw ra, 0(sp)
@@ -354,17 +354,25 @@ pub fn interrupt_handler(args: TokenStream, input: TokenStream) -> TokenStream {
     lw t6, 60(sp)
     addi sp, sp, (4 * 32)
     mret
-    ");
+    "
+    );
 
-    quote!(
-        #(#attrs)*
-        #[no_mangle]
-        pub unsafe fn #handler_ident() #block
+    if cfg!(feature = "nxti") {
+        quote!(
+            #(#attrs)*
+            #[no_mangle]
+            pub unsafe fn #wrapper_ident() #block
+        )
+        .into()
+    } else {
+        quote!(
+            #(#attrs)*
+            #[no_mangle]
+            pub unsafe fn #handler_ident() #block
 
-        core::arch::global_asm!(#assembly_string);     
+            core::arch::global_asm!(#assembly_string);
 
-    )
-    .into()
-
+        )
+        .into()
+    }
 }
-

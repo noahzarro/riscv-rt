@@ -61,6 +61,8 @@ SECTIONS
     #if defined(CLIC)
     . = ALIGN(1024);
     KEEP(*(.text.interrupt_vector));
+    . = ALIGN(1024);
+    KEEP(*(.text.nxti_trap_handler));
     #endif
 
     *(.text .text.*);

@@ -631,17 +631,100 @@ pub unsafe extern "Rust" fn default_setup_interrupts() {
     {
         extern "C" {
             fn _start_trap();
+            fn _nxti_trap_handler();
         }   
 
         extern {
             static interrupt_vector: usize;
         }
 
-        xtvec::write(_start_trap as usize, xSubMode::Default, xTrapMode::Clic);
+        // _nxti_trap_handler handles context saving and executes cycles through all pending interrupts via the nxti feature
+        #[cfg(feature = "nxti")]
+        xtvec::write(_nxti_trap_handler as usize, xSubMode::Default, xTrapMode::Clic);       
+
+        // _start_trap handles all non vectored interrupts and all exceptions
+        #[cfg(not(feature = "nxti"))]
+        xtvec::write(_start_trap as usize, xSubMode::Default, xTrapMode::Clic);       
+
         let interrupt_vector_ptr:*const usize = &interrupt_vector;
         xtvt::write_addr(interrupt_vector_ptr as usize);
     }
 }
+
+#[cfg(all(feature = "clic", feature = "nxti"))]
+global_asm!("
+/* NXTI interrupt handler */
+.section .text.nxti_trap_handler
+.global _nxti_trap_handler
+_nxti_trap_handler:
+/* store context */
+addi sp, sp, -(4 * 32)
+sw ra, 0(sp)
+sw t0, 4(sp)
+sw t1, 8(sp)
+sw t2, 12(sp)
+sw a0, 16(sp)
+sw a1, 20(sp)
+sw a2, 24(sp)
+sw a3, 28(sp)
+sw a4, 32(sp)
+sw a5, 36(sp)
+sw a6, 40(sp)
+sw a7, 44(sp)
+sw t3, 48(sp)
+sw t4, 52(sp)
+sw t5, 56(sp)
+sw t6, 60(sp)
+csrr t0, mcause
+csrr t1, mepc
+sw t0, 64(sp)
+sw t1, 68(sp)
+
+/* read out the address of the mtvt entry of the next pending interrupt */
+/* enables interrupts, and clears the pending bit of the found interrupt */
+1:
+csrrsi t0, 0x345, 8
+
+
+/* if no interrupt is pending, the received addr (t0) will be 0 */
+beqz t0, 2f
+
+/* jump to interrupt vector table */
+jalr t0
+
+/* repeat until no more interrupts are pending */
+j 1b
+
+2:
+
+csrci mstatus, 8 /* disable global interrupts*/
+
+/* load context */
+lw t0, 64(sp)
+lw t1, 68(sp)
+csrw mcause, t0
+csrw mepc, t1
+lw ra, 0(sp)
+lw t0, 4(sp)
+lw t1, 8(sp)
+lw t2, 12(sp)
+lw a0, 16(sp)
+lw a1, 20(sp)
+lw a2, 24(sp)
+lw a3, 28(sp)
+lw a4, 32(sp)
+lw a5, 36(sp)
+lw a6, 40(sp)
+lw a7, 44(sp)
+lw t3, 48(sp)
+lw t4, 52(sp)
+lw t5, 56(sp)
+lw t6, 60(sp)
+addi sp, sp, (4 * 32)
+
+/* return to previous code before context save */
+mret
+");
 
 #[cfg(feature = "clic")]
 global_asm!("
