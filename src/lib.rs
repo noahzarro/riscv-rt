@@ -638,13 +638,15 @@ pub unsafe extern "Rust" fn default_setup_interrupts() {
             static interrupt_vector: usize;
         }
 
-        // _nxti_trap_handler handles context saving and executes cycles through all pending interrupts via the nxti feature
-        #[cfg(feature = "nxti")]
-        xtvec::write(_nxti_trap_handler as usize, xSubMode::Default, xTrapMode::Clic);       
-
-        // _start_trap handles all non vectored interrupts and all exceptions
-        #[cfg(not(feature = "nxti"))]
-        xtvec::write(_start_trap as usize, xSubMode::Default, xTrapMode::Clic);       
+        if cfg!(feature = "nxti") {
+            // _nxti_trap_handler handles context saving and executes cycles through all pending interrupts via the nxti feature
+            xtvec::write(_nxti_trap_handler as usize, xSubMode::Default, xTrapMode::Clic);       
+        }
+        else
+        {
+            // _start_trap handles all non vectored interrupts and all exceptions
+            xtvec::write(_start_trap as usize, xSubMode::Default, xTrapMode::Clic);       
+        }
 
         let interrupt_vector_ptr:*const usize = &interrupt_vector;
         xtvt::write_addr(interrupt_vector_ptr as usize);
